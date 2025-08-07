@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Target, TrendingUp, Calendar, PieChart } from 'lucide-react';
+import { Target, TrendingUp, Calendar, PieChart, Filter } from 'lucide-react';
 import { Expense, Income, CategoryGoal, CustomCategory, DEFAULT_CATEGORIES } from '@/types/finance';
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
 
@@ -15,7 +17,11 @@ interface AnalyticsPageProps {
 }
 
 const AnalyticsPage = ({ onBack, expenses, income }: AnalyticsPageProps) => {
-  const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>('month');
+  const [filterType, setFilterType] = useState<'preset' | 'custom' | 'month'>('preset');
+  const [presetFilter, setPresetFilter] = useState<'week' | 'month' | '3months' | 'year'>('month');
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0'));
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
   
   // Load data from localStorage
   const categories = React.useMemo(() => {
@@ -28,26 +34,47 @@ const AnalyticsPage = ({ onBack, expenses, income }: AnalyticsPageProps) => {
     return saved ? JSON.parse(saved) : [];
   }, []);
 
-  // Filter data by timeframe
+  // Filter data based on selected period
   const getFilteredData = () => {
     const now = new Date();
-    const startDate = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
 
-    switch (timeframe) {
-      case 'week':
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case 'year':
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
+    if (filterType === 'preset') {
+      switch (presetFilter) {
+        case 'week':
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        case '3months':
+          startDate.setMonth(now.getMonth() - 3);
+          break;
+        case 'year':
+          startDate.setFullYear(now.getFullYear() - 1);
+          break;
+      }
+    } else if (filterType === 'month') {
+      const [year, month] = selectedMonth.split('-');
+      startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+      endDate = new Date(parseInt(year), parseInt(month), 0);
+    } else if (filterType === 'custom') {
+      if (customStartDate && customEndDate) {
+        startDate = new Date(customStartDate);
+        endDate = new Date(customEndDate);
+      }
     }
 
     return {
-      expenses: expenses.filter(exp => new Date(exp.date) >= startDate),
-      income: income.filter(inc => new Date(inc.date) >= startDate)
+      expenses: expenses.filter(exp => {
+        const expDate = new Date(exp.date);
+        return expDate >= startDate && expDate <= endDate;
+      }),
+      income: income.filter(inc => {
+        const incDate = new Date(inc.date);
+        return incDate >= startDate && incDate <= endDate;
+      })
     };
   };
 
@@ -65,7 +92,7 @@ const AnalyticsPage = ({ onBack, expenses, income }: AnalyticsPageProps) => {
     return {
       name: category ? `${category.emoji} ${category.name}` : categoryId,
       value: amount,
-      color: category?.color || 'hsl(var(--muted))'
+      color: category?.color || 'hsl(220, 70%, 50%)'
     };
   });
 
@@ -94,59 +121,118 @@ const AnalyticsPage = ({ onBack, expenses, income }: AnalyticsPageProps) => {
     };
   });
 
-  // Weekly spending trend
-  const getWeeklyTrend = () => {
-    const weeklyData: { name: string; amount: number }[] = [];
-    const today = new Date();
-    
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      const dayName = date.toLocaleDateString('en', { weekday: 'short' });
-      
-      const dayExpenses = filteredExpenses.filter(exp => {
-        const expDate = new Date(exp.date);
-        return expDate.toDateString() === date.toDateString();
-      });
-      
-      const total = dayExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-      weeklyData.push({ name: dayName, amount: total });
-    }
-    
-    return weeklyData;
-  };
-
-  const weeklyTrend = getWeeklyTrend();
   const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
   const totalIncome = filteredIncome.reduce((sum, inc) => sum + inc.amount, 0);
 
+  // Generate month options for the last 12 months
+  const getMonthOptions = () => {
+    const months = [];
+    const now = new Date();
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const value = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+      const label = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      months.push({ value, label });
+    }
+    return months;
+  };
+
   return (
     <div className="p-4 pb-24 space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={onBack}>← Back</Button>
-          <h1 className="text-2xl font-bold">Analytics</h1>
-        </div>
-        
-        {/* Timeframe Selector */}
-        <div className="flex gap-1 bg-muted p-1 rounded-lg">
-          {(['week', 'month', 'year'] as const).map((period) => (
-            <Button
-              key={period}
-              variant={timeframe === period ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setTimeframe(period)}
-              className="capitalize"
-            >
-              {period}
-            </Button>
-          ))}
-        </div>
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="ghost" onClick={onBack}>← Back</Button>
+        <h1 className="text-2xl font-bold">Analytics</h1>
       </div>
+
+      {/* Period Filter */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Time Period
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2 mb-4">
+            {[
+              { key: 'preset', label: 'Quick Select' },
+              { key: 'month', label: 'By Month' },
+              { key: 'custom', label: 'Custom Range' }
+            ].map((type) => (
+              <Button
+                key={type.key}
+                variant={filterType === type.key ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterType(type.key as any)}
+              >
+                {type.label}
+              </Button>
+            ))}
+          </div>
+
+          {filterType === 'preset' && (
+            <div className="flex gap-2">
+              {([
+                { key: 'week', label: 'Past Week' },
+                { key: 'month', label: 'Past Month' },
+                { key: '3months', label: 'Past 3 Months' },
+                { key: 'year', label: 'Past Year' }
+              ] as const).map((period) => (
+                <Button
+                  key={period.key}
+                  variant={presetFilter === period.key ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPresetFilter(period.key)}
+                >
+                  {period.label}
+                </Button>
+              ))}
+            </div>
+          )}
+
+          {filterType === 'month' && (
+            <div>
+              <Label>Select Month</Label>
+              <select
+                className="w-full h-10 px-3 border rounded-md"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                {getMonthOptions().map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {filterType === 'custom' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Start Date</Label>
+                <Input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>End Date</Label>
+                <Input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-honey text-white">
+        <Card className="bg-gradient-to-r from-amber-400 to-orange-500 text-white">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -158,7 +244,7 @@ const AnalyticsPage = ({ onBack, expenses, income }: AnalyticsPageProps) => {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-ocean text-white">
+        <Card className="bg-gradient-to-r from-emerald-400 to-cyan-500 text-white">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -256,25 +342,6 @@ const AnalyticsPage = ({ onBack, expenses, income }: AnalyticsPageProps) => {
           </CardContent>
         </Card>
       )}
-
-      {/* Weekly Trend */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Weekly Spending Trend</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weeklyTrend}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip formatter={(value: number) => [`€${value.toFixed(2)}`, 'Spent']} />
-                <Line type="monotone" dataKey="amount" stroke="hsl(var(--honey-primary))" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

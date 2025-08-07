@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Income } from '@/types/finance';
+import { Income, Account, DEFAULT_ACCOUNTS } from '@/types/finance';
 import { ArrowLeft } from 'lucide-react';
 
 interface IncomeFormProps {
@@ -13,7 +13,13 @@ interface IncomeFormProps {
 }
 
 const IncomeForm = ({ onBack, onSave }: IncomeFormProps) => {
+  const accounts = React.useMemo(() => {
+    const saved = localStorage.getItem('honey-accounts');
+    return saved ? JSON.parse(saved) : DEFAULT_ACCOUNTS;
+  }, []);
+
   const [amount, setAmount] = useState('');
+  const [account, setAccount] = useState(accounts[0]?.id || 'main');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -26,6 +32,7 @@ const IncomeForm = ({ onBack, onSave }: IncomeFormProps) => {
       amount: parseFloat(amount),
       description,
       date,
+      account,
     };
 
     onSave(income);
@@ -67,12 +74,25 @@ const IncomeForm = ({ onBack, onSave }: IncomeFormProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Source</Label>
+              <Label>Account</Label>
+              <select
+                className="w-full h-10 px-3 border rounded-md"
+                value={account}
+                onChange={(e) => setAccount(e.target.value)}
+              >
+                {accounts.map((acc: Account) => (
+                  <option key={acc.id} value={acc.id}>{acc.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
               <Input
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Salary, freelance, etc."
+                placeholder="Source of income"
                 className="rounded-xl"
                 required
               />
@@ -91,7 +111,7 @@ const IncomeForm = ({ onBack, onSave }: IncomeFormProps) => {
 
             <Button 
               type="submit" 
-              className="w-full bg-gradient-ocean hover:scale-105 transition-all duration-200 rounded-xl py-3 text-white font-medium shadow-soft"
+              className="w-full bg-gradient-to-r from-emerald-400 to-cyan-500 hover:from-emerald-500 hover:to-cyan-600 hover:scale-105 transition-all duration-200 rounded-xl py-3 text-white font-medium shadow-soft"
             >
               Save Income
             </Button>

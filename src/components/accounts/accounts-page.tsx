@@ -29,7 +29,7 @@ const AccountsPage = ({ onBack }: AccountsPageProps) => {
     name: '',
     balance: '',
     type: 'checking' as Account['type'],
-    color: 'hsl(var(--honey-primary))'
+    color: 'hsl(24, 100%, 58%)'
   });
 
   const [transferForm, setTransferForm] = useState({
@@ -63,7 +63,7 @@ const AccountsPage = ({ onBack }: AccountsPageProps) => {
     };
 
     setAccounts([...accounts, account]);
-    setNewAccount({ name: '', balance: '', type: 'checking', color: 'hsl(var(--honey-primary))' });
+    setNewAccount({ name: '', balance: '', type: 'checking', color: 'hsl(24, 100%, 58%)' });
     setIsAddAccountOpen(false);
     toast.success('Account added successfully!');
   };
@@ -153,10 +153,10 @@ const AccountsPage = ({ onBack }: AccountsPageProps) => {
           <Button variant="ghost" onClick={onBack}>← Back</Button>
           <h1 className="text-2xl font-bold">Accounts</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Dialog open={isTransferOpen} onOpenChange={setIsTransferOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" size="sm">
                 <ArrowRightLeft className="h-4 w-4 mr-2" />
                 Transfer
               </Button>
@@ -219,7 +219,7 @@ const AccountsPage = ({ onBack }: AccountsPageProps) => {
 
           <Dialog open={isAddAccountOpen} onOpenChange={setIsAddAccountOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Account
               </Button>
@@ -270,7 +270,7 @@ const AccountsPage = ({ onBack }: AccountsPageProps) => {
       </div>
 
       {/* Total Balance */}
-      <Card className="bg-gradient-honey text-white">
+      <Card className="bg-gradient-to-r from-amber-400 to-orange-500 text-white">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>

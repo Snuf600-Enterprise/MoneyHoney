@@ -28,7 +28,7 @@ const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
               {index === 2 && (
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="bg-gradient-honey text-white p-4 rounded-2xl shadow-soft hover:scale-105 transition-all duration-200 -mt-6 animate-bounce-gentle"
+                  className="bg-gradient-to-r from-amber-400 to-orange-500 text-white p-4 rounded-2xl shadow-soft hover:scale-105 transition-all duration-200 -mt-6"
                 >
                   <Plus size={24} />
                 </button>
@@ -70,7 +70,7 @@ const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
                   setIsAddModalOpen(false);
                   onTabChange('add-expense');
                 }}
-                className="bg-gradient-honey text-white p-4 rounded-2xl text-center shadow-soft hover:scale-105 transition-all duration-200"
+                className="bg-gradient-to-r from-amber-400 to-orange-500 text-white p-4 rounded-2xl text-center shadow-soft hover:scale-105 transition-all duration-200"
               >
                 <Plus size={24} className="mx-auto mb-2" />
                 <span className="font-medium">Add Expense</span>
@@ -81,7 +81,7 @@ const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
                   setIsAddModalOpen(false);
                   onTabChange('add-income');
                 }}
-                className="bg-gradient-ocean text-white p-4 rounded-2xl text-center shadow-soft hover:scale-105 transition-all duration-200"
+                className="bg-gradient-to-r from-emerald-400 to-cyan-500 text-white p-4 rounded-2xl text-center shadow-soft hover:scale-105 transition-all duration-200"
               >
                 <Plus size={24} className="mx-auto mb-2" />
                 <span className="font-medium">Add Income</span>

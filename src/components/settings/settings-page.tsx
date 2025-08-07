@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, Edit, Moon, Sun, Target } from 'lucide-react';
+import { Trash2, Plus, Edit, Moon, Sun, Target, Settings as SettingsIcon } from 'lucide-react';
 import { useTheme } from '@/contexts/theme-context';
 import { CustomCategory, CategoryGoal, DEFAULT_CATEGORIES } from '@/types/finance';
 import { toast } from 'sonner';
@@ -29,8 +29,19 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [newCategory, setNewCategory] = useState({ name: '', emoji: '📦', color: 'hsl(var(--honey-primary))' });
-  const [newGoal, setNewGoal] = useState({ category: '', monthlyTarget: '', description: '' });
+  // Dashboard customization
+  const [dashboardSettings, setDashboardSettings] = useState(() => {
+    const saved = localStorage.getItem('honey-dashboard-settings');
+    return saved ? JSON.parse(saved) : {
+      showRecentTransactions: true,
+      showSpendingChart: true,
+      showBudgetOverview: true,
+      showAccountBalances: true,
+      showGoalProgress: true
+    };
+  });
+
+  const [newCategory, setNewCategory] = useState({ name: '', emoji: '📦', color: 'hsl(24, 100%, 58%)' });
 
   // Save to localStorage
   React.useEffect(() => {
@@ -40,6 +51,10 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
   React.useEffect(() => {
     localStorage.setItem('honey-goals', JSON.stringify(goals));
   }, [goals]);
+
+  React.useEffect(() => {
+    localStorage.setItem('honey-dashboard-settings', JSON.stringify(dashboardSettings));
+  }, [dashboardSettings]);
 
   const addCategory = () => {
     if (!newCategory.name.trim()) return;
@@ -52,7 +67,7 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
     };
     
     setCategories([...categories, category]);
-    setNewCategory({ name: '', emoji: '📦', color: 'hsl(var(--honey-primary))' });
+    setNewCategory({ name: '', emoji: '📦', color: 'hsl(24, 100%, 58%)' });
     toast.success('Category added successfully!');
   };
 
@@ -62,25 +77,31 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
     toast.success('Category deleted successfully!');
   };
 
-  const addGoal = () => {
-    if (!newGoal.category || !newGoal.monthlyTarget) return;
+  const setGoalForCategory = (categoryId: string, monthlyTarget: number) => {
+    const existingGoal = goals.find(g => g.category === categoryId);
+    const category = categories.find(cat => cat.id === categoryId);
     
-    const goal: CategoryGoal = {
-      id: Date.now().toString(),
-      category: newGoal.category,
-      monthlyTarget: Number(newGoal.monthlyTarget),
-      description: newGoal.description,
-      color: categories.find(cat => cat.id === newGoal.category)?.color || 'hsl(var(--honey-primary))'
-    };
-    
-    setGoals([...goals, goal]);
-    setNewGoal({ category: '', monthlyTarget: '', description: '' });
-    toast.success('Goal added successfully!');
+    if (existingGoal) {
+      setGoals(goals.map(goal => 
+        goal.category === categoryId 
+          ? { ...goal, monthlyTarget }
+          : goal
+      ));
+    } else {
+      const newGoal: CategoryGoal = {
+        id: Date.now().toString(),
+        category: categoryId,
+        monthlyTarget,
+        color: category?.color || 'hsl(24, 100%, 58%)'
+      };
+      setGoals([...goals, newGoal]);
+    }
+    toast.success('Goal updated successfully!');
   };
 
-  const deleteGoal = (id: string) => {
-    setGoals(goals.filter(goal => goal.id !== id));
-    toast.success('Goal deleted successfully!');
+  const removeGoal = (categoryId: string) => {
+    setGoals(goals.filter(goal => goal.category !== categoryId));
+    toast.success('Goal removed successfully!');
   };
 
   return (
@@ -109,12 +130,45 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
         </CardContent>
       </Card>
 
-      {/* Custom Categories */}
+      {/* Dashboard Customization */}
       <Card>
         <CardHeader>
-          <CardTitle>Custom Categories</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <SettingsIcon className="h-5 w-5" />
+            Dashboard Customization
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {Object.entries(dashboardSettings).map(([key, value]) => (
+            <div key={key} className="flex items-center justify-between">
+              <div>
+                <p className="font-medium capitalize">
+                  {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Show this section on your dashboard
+                </p>
+              </div>
+              <Switch 
+                checked={value as boolean} 
+                onCheckedChange={(checked) => 
+                  setDashboardSettings(prev => ({ ...prev, [key]: checked }))
+                } 
+              />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Categories & Goals Management */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Categories & Goals
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
           {/* Add New Category */}
           <div className="space-y-3">
             <h4 className="font-medium">Add New Category</h4>
@@ -143,106 +197,66 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
             </div>
           </div>
 
-          {/* Categories List */}
-          <div className="space-y-2">
-            <h4 className="font-medium">Your Categories</h4>
-            <div className="grid grid-cols-2 gap-2">
-              {categories.map((category) => (
-                <div key={category.id} className="flex items-center justify-between p-2 border rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <span>{category.emoji}</span>
-                    <span className="text-sm">{category.name}</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => deleteCategory(category.id)}
-                    className="h-6 w-6 p-0"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Category Goals */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            Category Goals
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Add New Goal */}
-          <div className="space-y-3">
-            <h4 className="font-medium">Set Monthly Goal</h4>
-            <div className="grid grid-cols-1 gap-3">
-              <div>
-                <Label>Category</Label>
-                <select
-                  className="w-full h-10 px-3 border rounded-md"
-                  value={newGoal.category}
-                  onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value })}
-                >
-                  <option value="">Select category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.emoji} {cat.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label>Monthly Target (€)</Label>
-                  <Input
-                    type="number"
-                    value={newGoal.monthlyTarget}
-                    onChange={(e) => setNewGoal({ ...newGoal, monthlyTarget: e.target.value })}
-                    placeholder="0"
-                  />
-                </div>
-                <div className="flex items-end">
-                  <Button onClick={addGoal} className="w-full">
-                    <Plus className="h-4 w-4 mr-1" /> Add Goal
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Goals List */}
-          <div className="space-y-2">
-            <h4 className="font-medium">Active Goals</h4>
-            {goals.length > 0 ? (
-              <div className="space-y-2">
-                {goals.map((goal) => {
-                  const category = categories.find(cat => cat.id === goal.category);
-                  return (
-                    <div key={goal.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <span>{category?.emoji}</span>
-                        <div>
-                          <p className="font-medium">{category?.name}</p>
-                          <p className="text-sm text-muted-foreground">€{goal.monthlyTarget}/month</p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteGoal(goal.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+          {/* Categories List with Goals */}
+          <div className="space-y-4">
+            <h4 className="font-medium">Manage Categories & Set Goals</h4>
+            {categories.map((category) => {
+              const goal = goals.find(g => g.category === category.id);
+              return (
+                <div key={category.id} className="p-4 border rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span>{category.emoji}</span>
+                      <span className="font-medium">{category.name}</span>
+                      {goal && (
+                        <Badge variant="secondary">
+                          Goal: €{goal.monthlyTarget}/month
+                        </Badge>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-sm">No goals set yet</p>
-            )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteCategory(category.id)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      placeholder="Monthly goal (€)"
+                      defaultValue={goal?.monthlyTarget || ''}
+                      className="flex-1"
+                      id={`goal-${category.id}`}
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const input = document.getElementById(`goal-${category.id}`) as HTMLInputElement;
+                        const value = parseFloat(input.value);
+                        if (value > 0) {
+                          setGoalForCategory(category.id, value);
+                        }
+                      }}
+                    >
+                      {goal ? 'Update' : 'Set'} Goal
+                    </Button>
+                    {goal && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeGoal(category.id)}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
