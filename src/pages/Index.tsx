@@ -1,13 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { ThemeProvider } from '@/contexts/theme-context';
 import MobileNav from '@/components/ui/mobile-nav';
 import DashboardOverview from '@/components/dashboard/dashboard-overview';
 import ExpenseForm from '@/components/dashboard/expense-form';
 import IncomeForm from '@/components/dashboard/income-form';
+import SettingsPage from '@/components/settings/settings-page';
+import AccountsPage from '@/components/accounts/accounts-page';
+import AnalyticsPage from '@/components/analytics/analytics-page';
 import { Expense, Income } from '@/types/finance';
 
-const Index = () => {
+const IndexContent = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [income, setIncome] = useState<Income[]>([]);
@@ -57,31 +61,31 @@ const Index = () => {
       case 'add-income':
         return <IncomeForm onBack={handleBackToDashboard} onSave={handleSaveIncome} />;
       case 'analytics':
-        return (
-          <div className="p-4 pb-24 text-center">
-            <h1 className="text-2xl font-bold mb-4">Analytics</h1>
-            <p className="text-muted-foreground">Advanced analytics coming soon!</p>
-          </div>
-        );
+        return <AnalyticsPage onBack={handleBackToDashboard} expenses={expenses} income={income} />;
       case 'settings':
-        return (
-          <div className="p-4 pb-24 text-center">
-            <h1 className="text-2xl font-bold mb-4">Settings</h1>
-            <p className="text-muted-foreground">Settings panel coming soon!</p>
-          </div>
-        );
+        return <SettingsPage onBack={handleBackToDashboard} />;
+      case 'accounts':
+        return <AccountsPage onBack={handleBackToDashboard} />;
       default:
         return <DashboardOverview expenses={expenses} income={income} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-soft">
-      <main className="max-w-md mx-auto bg-white/50 backdrop-blur-sm min-h-screen">
+    <div className="min-h-screen bg-gradient-soft dark:bg-gray-900">
+      <main className="max-w-md mx-auto bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm min-h-screen">
         {renderContent()}
       </main>
       <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <ThemeProvider>
+      <IndexContent />
+    </ThemeProvider>
   );
 };
 

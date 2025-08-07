@@ -1,149 +1,125 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* HoneyMoney Design System - Friendly Financial App */
-
 @layer base {
   :root {
-    /* Core System Colors */
+    /* Base colors */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
-    /* Brand Colors - Warm and Trustworthy */
-    --honey-primary: 45 95% 55%; /* Golden honey */
-    --honey-primary-foreground: 45 95% 10%;
-    --honey-secondary: 210 95% 65%; /* Soft blue */
-    --honey-secondary-foreground: 210 95% 15%;
-    
-    /* Category Colors - Friendly Pastels */
-    --category-food: 25 85% 65%; /* Warm orange */
-    --category-transport: 210 75% 65%; /* Soft blue */
-    --category-entertainment: 285 75% 65%; /* Soft purple */
-    --category-shopping: 340 75% 65%; /* Soft pink */
-    --category-health: 145 65% 55%; /* Mint green */
-    --category-bills: 200 65% 55%; /* Ocean blue */
-    --category-savings: 65 65% 55%; /* Forest green */
-    --category-other: 220 15% 65%; /* Neutral gray */
-
-    /* UI Colors */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 45 95% 55%;
-    --primary-foreground: 45 95% 10%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
+
+    /* Primary colors */
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    /* Secondary colors */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    /* Muted colors */
+    --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 45 95% 95%;
-    --accent-foreground: 45 95% 15%;
+
+    /* Accent colors */
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+
+    /* Destructive colors */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+
+    /* Border and input */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 45 95% 55%;
-    --radius: 1rem; /* More rounded for friendly feel */
+    --ring: 222.2 84% 4.9%;
 
-    /* Success and Warning */
-    --success: 145 65% 50%;
-    --success-foreground: 145 65% 10%;
-    --warning: 35 95% 60%;
-    --warning-foreground: 35 95% 10%;
+    /* Radius */
+    --radius: 0.75rem;
 
-    /* Gradients */
-    --gradient-honey: linear-gradient(135deg, hsl(45 95% 55%) 0%, hsl(35 90% 60%) 100%);
-    --gradient-ocean: linear-gradient(135deg, hsl(210 95% 65%) 0%, hsl(200 85% 70%) 100%);
-    --gradient-soft: linear-gradient(135deg, hsl(45 20% 98%) 0%, hsl(210 25% 96%) 100%);
+    /* Custom honey colors */
+    --honey-primary: 45 93% 67%;
+    --honey-secondary: 39 77% 83%;
+
+    /* Category colors */
+    --category-food: 15 79% 65%;
+    --category-transport: 217 91% 60%;
+    --category-entertainment: 262 83% 58%;
+    --category-shopping: 339 82% 52%;
+    --category-health: 142 71% 45%;
+    --category-bills: 25 95% 53%;
+    --category-savings: 120 73% 75%;
+    --category-other: 220 13% 69%;
+
+    /* Success and warning */
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
   }
 
   .dark {
+    /* Base colors - dark mode */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 45 95% 65%;
+
+    /* Primary colors - dark mode */
+    --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
+
+    /* Secondary colors - dark mode */
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
+
+    /* Muted colors - dark mode */
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
+
+    /* Accent colors - dark mode */
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
+
+    /* Destructive colors - dark mode */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+
+    /* Border and input - dark mode */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 45 95% 65%;
+    --ring: 212.7 26.8% 83.9%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    background: var(--gradient-soft);
-    min-height: 100vh;
-  }
-
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
+    @apply bg-background text-foreground;
   }
 }
 
-/* Custom animations for friendly interactions */
 @layer utilities {
-  .animate-bounce-gentle {
-    animation: bounce-gentle 2s infinite;
+  /* Gradient backgrounds */
+  .bg-gradient-honey {
+    background: linear-gradient(135deg, hsl(var(--honey-primary)) 0%, hsl(var(--honey-secondary)) 100%);
   }
 
-  .animate-slide-up {
-    animation: slide-up 0.3s ease-out;
+  .bg-gradient-ocean {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
 
-  .animate-fade-in {
-    animation: fade-in 0.4s ease-out;
+  .bg-gradient-soft {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   }
 
-  @keyframes bounce-gentle {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-  }
-
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  /* Category color utilities */
-  .text-category-food { color: hsl(var(--category-food)); }
-  .text-category-transport { color: hsl(var(--category-transport)); }
-  .text-category-entertainment { color: hsl(var(--category-entertainment)); }
-  .text-category-shopping { color: hsl(var(--category-shopping)); }
-  .text-category-health { color: hsl(var(--category-health)); }
-  .text-category-bills { color: hsl(var(--category-bills)); }
-  .text-category-savings { color: hsl(var(--category-savings)); }
-  .text-category-other { color: hsl(var(--category-other)); }
-
+  /* Specific category background colors */
   .bg-category-food { background-color: hsl(var(--category-food)); }
   .bg-category-transport { background-color: hsl(var(--category-transport)); }
   .bg-category-entertainment { background-color: hsl(var(--category-entertainment)); }
@@ -153,23 +129,22 @@
   .bg-category-savings { background-color: hsl(var(--category-savings)); }
   .bg-category-other { background-color: hsl(var(--category-other)); }
 
-  /* Glass morphism effect */
-  .glass {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+  /* Text gradient utilities */
+  .text-transparent {
+    color: transparent;
+  }
+  
+  .bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 
-  /* Gradient backgrounds */
-  .bg-gradient-honey {
-    background: var(--gradient-honey);
+  .bg-gradient-honey-text {
+    background: linear-gradient(135deg, hsl(var(--honey-primary)) 0%, hsl(var(--honey-secondary)) 100%);
   }
+}
 
-  .bg-gradient-ocean {
-    background: var(--gradient-ocean);
-  }
-
-  .bg-gradient-soft {
-    background: var(--gradient-soft);
-  }
+/* Dark mode gradient overrides */
+.dark .bg-gradient-soft {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
 }
