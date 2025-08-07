@@ -1,21 +1,20 @@
-
-import { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.9c3d947adf1842cdb773926776b621b2',
-  appName: 'HoneyMoney',
-  webDir: 'dist',
+  appId: "com.honeymoney.app",
+  appName: "HoneyMoney",
+  webDir: "dist",
   server: {
     url: "https://9c3d947a-df18-42cd-b773-926776b621b2.lovableproject.com?forceHideBadge=true",
-    cleartext: true
+    cleartext: true,
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
       backgroundColor: "#FCD34D",
-      showSpinner: false
-    }
-  }
+      showSpinner: false,
+    },
+  },
 };
 
 export default config;
