@@ -153,120 +153,68 @@ const AccountsPage = ({ onBack }: AccountsPageProps) => {
           <Button variant="ghost" onClick={onBack}>← Back</Button>
           <h1 className="text-2xl font-bold">Accounts</h1>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Dialog open={isTransferOpen} onOpenChange={setIsTransferOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <ArrowRightLeft className="h-4 w-4 mr-2" />
-                Transfer
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Transfer Between Accounts</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label>From Account</Label>
-                  <select
-                    className="w-full h-10 px-3 border rounded-md"
-                    value={transferForm.fromAccount}
-                    onChange={(e) => setTransferForm({ ...transferForm, fromAccount: e.target.value })}
-                  >
-                    <option value="">Select account</option>
-                    {accounts.map((acc) => (
-                      <option key={acc.id} value={acc.id}>{acc.name} (€{acc.balance.toFixed(2)})</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <Label>To Account</Label>
-                  <select
-                    className="w-full h-10 px-3 border rounded-md"
-                    value={transferForm.toAccount}
-                    onChange={(e) => setTransferForm({ ...transferForm, toAccount: e.target.value })}
-                  >
-                    <option value="">Select account</option>
-                    {accounts.map((acc) => (
-                      <option key={acc.id} value={acc.id}>{acc.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <Label>Amount (€)</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={transferForm.amount}
-                    onChange={(e) => setTransferForm({ ...transferForm, amount: e.target.value })}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div>
-                  <Label>Description (Optional)</Label>
-                  <Input
-                    value={transferForm.description}
-                    onChange={(e) => setTransferForm({ ...transferForm, description: e.target.value })}
-                    placeholder="Transfer description"
-                  />
-                </div>
-                <Button onClick={handleTransfer} className="w-full">
-                  Transfer Funds
-                </Button>
+        <Dialog open={isTransferOpen} onOpenChange={setIsTransferOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <ArrowRightLeft className="h-4 w-4 mr-2" />
+              Transfer
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Transfer Between Accounts</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>From Account</Label>
+                <select
+                  className="w-full h-10 px-3 border rounded-md"
+                  value={transferForm.fromAccount}
+                  onChange={(e) => setTransferForm({ ...transferForm, fromAccount: e.target.value })}
+                >
+                  <option value="">Select account</option>
+                  {accounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>{acc.name} (€{acc.balance.toFixed(2)})</option>
+                  ))}
+                </select>
               </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={isAddAccountOpen} onOpenChange={setIsAddAccountOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Account
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Account</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label>Account Name</Label>
-                  <Input
-                    value={newAccount.name}
-                    onChange={(e) => setNewAccount({ ...newAccount, name: e.target.value })}
-                    placeholder="Account name"
-                  />
-                </div>
-                <div>
-                  <Label>Initial Balance (€)</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={newAccount.balance}
-                    onChange={(e) => setNewAccount({ ...newAccount, balance: e.target.value })}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div>
-                  <Label>Account Type</Label>
-                  <select
-                    className="w-full h-10 px-3 border rounded-md"
-                    value={newAccount.type}
-                    onChange={(e) => setNewAccount({ ...newAccount, type: e.target.value as Account['type'] })}
-                  >
-                    <option value="checking">Checking</option>
-                    <option value="savings">Savings</option>
-                    <option value="credit">Credit</option>
-                    <option value="cash">Cash</option>
-                  </select>
-                </div>
-                <Button onClick={addAccount} className="w-full">
-                  Add Account
-                </Button>
+              <div>
+                <Label>To Account</Label>
+                <select
+                  className="w-full h-10 px-3 border rounded-md"
+                  value={transferForm.toAccount}
+                  onChange={(e) => setTransferForm({ ...transferForm, toAccount: e.target.value })}
+                >
+                  <option value="">Select account</option>
+                  {accounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>{acc.name}</option>
+                  ))}
+                </select>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <div>
+                <Label>Amount (€)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={transferForm.amount}
+                  onChange={(e) => setTransferForm({ ...transferForm, amount: e.target.value })}
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <Label>Description (Optional)</Label>
+                <Input
+                  value={transferForm.description}
+                  onChange={(e) => setTransferForm({ ...transferForm, description: e.target.value })}
+                  placeholder="Transfer description"
+                />
+              </div>
+              <Button onClick={handleTransfer} className="w-full">
+                Transfer Funds
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Total Balance */}
@@ -310,6 +258,59 @@ const AccountsPage = ({ onBack }: AccountsPageProps) => {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Add Account Button - Moved below accounts */}
+      <div className="flex justify-center">
+        <Dialog open={isAddAccountOpen} onOpenChange={setIsAddAccountOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Account
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Account</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Account Name</Label>
+                <Input
+                  value={newAccount.name}
+                  onChange={(e) => setNewAccount({ ...newAccount, name: e.target.value })}
+                  placeholder="Account name"
+                />
+              </div>
+              <div>
+                <Label>Initial Balance (€)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={newAccount.balance}
+                  onChange={(e) => setNewAccount({ ...newAccount, balance: e.target.value })}
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <Label>Account Type</Label>
+                <select
+                  className="w-full h-10 px-3 border rounded-md"
+                  value={newAccount.type}
+                  onChange={(e) => setNewAccount({ ...newAccount, type: e.target.value as Account['type'] })}
+                >
+                  <option value="checking">Checking</option>
+                  <option value="savings">Savings</option>
+                  <option value="credit">Credit</option>
+                  <option value="cash">Cash</option>
+                </select>
+              </div>
+              <Button onClick={addAccount} className="w-full">
+                Add Account
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Recent Transfers */}

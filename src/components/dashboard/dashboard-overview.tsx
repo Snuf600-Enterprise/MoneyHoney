@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Expense, Income, CustomCategory, DEFAULT_CATEGORIES, Account, DEFAULT_ACCOUNTS } from '@/types/finance';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
-import { Euro, TrendingUp, TrendingDown, Wallet, Eye, EyeOff, Target, Calendar, PieChart as PieChartIcon } from 'lucide-react';
+import { Euro, TrendingUp, TrendingDown, Wallet, Target, Calendar, PieChart as PieChartIcon } from 'lucide-react';
 
 interface DashboardOverviewProps {
   expenses: Expense[];
@@ -30,7 +30,7 @@ const DashboardOverview = ({ expenses, income }: DashboardOverviewProps) => {
   });
 
   // Dashboard customization
-  const [visibleSections, setVisibleSections] = useState(() => {
+  const [visibleSections] = useState(() => {
     const saved = localStorage.getItem('honey-dashboard-sections');
     return saved ? JSON.parse(saved) : {
       balance: true,
@@ -40,14 +40,6 @@ const DashboardOverview = ({ expenses, income }: DashboardOverviewProps) => {
       recent: true
     };
   });
-
-  React.useEffect(() => {
-    localStorage.setItem('honey-dashboard-sections', JSON.stringify(visibleSections));
-  }, [visibleSections]);
-
-  const toggleSection = (section: string) => {
-    setVisibleSections((prev: any) => ({ ...prev, [section]: !prev[section] }));
-  };
 
   // Calculate totals
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -115,56 +107,20 @@ const DashboardOverview = ({ expenses, income }: DashboardOverviewProps) => {
 
   const formatCurrency = (amount: number) => `€${amount.toFixed(2)}`;
 
-  const getSectionIcon = (section: string) => {
-    const icons = {
-      balance: Wallet,
-      spending: PieChartIcon,
-      goals: Target,
-      accounts: Wallet,
-      recent: Calendar
-    };
-    const Icon = icons[section as keyof typeof icons];
-    return Icon ? <Icon className="h-4 w-4" /> : null;
-  };
-
   return (
     <div className="p-4 pb-24 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold mb-2">
-          Welcome to <span className="text-transparent bg-clip-text bg-gradient-honey">HoneyMoney</span>
+          Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">HoneyMoney</span>
         </h1>
         <p className="text-muted-foreground">Track your finances with ease</p>
       </div>
 
-      {/* Dashboard Customization */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Customize Dashboard</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(visibleSections).map(([section, visible]) => (
-              <Button
-                key={section}
-                variant={visible ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => toggleSection(section)}
-                className="capitalize"
-              >
-                {getSectionIcon(section)}
-                <span className="ml-1">{section}</span>
-                {visible ? <Eye className="h-3 w-3 ml-1" /> : <EyeOff className="h-3 w-3 ml-1" />}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Balance Cards */}
       {visibleSections.balance && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-honey text-white shadow-soft border-0">
+          <Card className="bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-soft border-0">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -176,7 +132,7 @@ const DashboardOverview = ({ expenses, income }: DashboardOverviewProps) => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-ocean text-white shadow-soft border-0">
+          <Card className="bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-soft border-0">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -272,8 +228,8 @@ const DashboardOverview = ({ expenses, income }: DashboardOverviewProps) => {
         <Card className="shadow-soft border-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Euro className="h-5 w-5" />
-              Spending Breakdown
+              <PieChartIcon className="h-5 w-5" />
+              Spending by Category
             </CardTitle>
           </CardHeader>
           <CardContent>
