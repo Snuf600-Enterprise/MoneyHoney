@@ -15,6 +15,11 @@ const config: CapacitorConfig = {
       showSpinner: false,
     },
   },
+  android: {
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: true,
+  },
 };
 
 export default config;

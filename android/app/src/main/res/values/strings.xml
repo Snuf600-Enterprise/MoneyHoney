@@ -4,4 +4,15 @@
     <string name="title_activity_main">HoneyMoney</string>
     <string name="package_name">com.honeymoney.app</string>
     <string name="custom_url_scheme">com.honeymoney.app</string>
+    
+    <!-- PWA Asset Links -->
+    <string name="asset_statements">
+        [{
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://9c3d947a-df18-42cd-b773-926776b621b2.lovableproject.com\"
+            }
+        }]
+    </string>
 </resources>
